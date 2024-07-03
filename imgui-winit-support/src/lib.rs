@@ -86,7 +86,7 @@ use winit::{
 
 use winit::{
     error::ExternalError,
-    event::{ElementState, Event, MouseButton, MouseScrollDelta, TouchPhase, WindowEvent},
+    event::{ElementState, MouseButton, MouseScrollDelta, TouchPhase, WindowEvent},
     window::{CursorIcon as MouseCursor, Window},
 };
 
@@ -393,39 +393,14 @@ impl WinitPlatform {
                 .to_logical(window.scale_factor()),
         }
     }
-    /// Handles a winit event.
+    /// Handles a winit window event.
     ///
     /// This function performs the following actions (depends on the event):
     ///
     /// * window size / dpi factor changes are applied
     /// * keyboard state is updated
     /// * mouse state is updated
-    pub fn handle_event<T>(&mut self, io: &mut Io, window: &Window, event: &Event<T>) {
-        match *event {
-            Event::WindowEvent {
-                window_id,
-                ref event,
-            } if window_id == window.id() => {
-                self.handle_window_event(io, window, event);
-            }
-            // Track key release events outside our window. If we don't do this,
-            // we might never see the release event if some other window gets focus.
-            // Event::DeviceEvent {
-            //     event:
-            //         DeviceEvent::Key(RawKeyEvent {
-            //             physical_key,
-            //             state: ElementState::Released,
-            //         }),
-            //     ..
-            // } => {
-            //     if let Some(key) = to_imgui_key(key) {
-            //         io.add_key_event(key, false);
-            //     }
-            // }
-            _ => (),
-        }
-    }
-    fn handle_window_event(&mut self, io: &mut Io, window: &Window, event: &WindowEvent) {
+    pub fn handle_window_event(&mut self, io: &mut Io, window: &Window, event: &WindowEvent) {
         match *event {
             WindowEvent::Resized(physical_size) => {
                 let logical_size = physical_size.to_logical(window.scale_factor());
