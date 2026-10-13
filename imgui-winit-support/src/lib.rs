@@ -78,10 +78,12 @@ use std::cmp::Ordering;
 
 // Re-export winit to make it easier for users to use the correct version.
 pub use winit;
+// Desktop platforms only: elsewhere (Android, iOS, the web) the logical key is used instead
+#[cfg(not(any(target_os = "android", target_os = "ios", target_arch = "wasm32")))]
+use winit::platform::modifier_supplement::KeyEventExtModifierSupplement;
 use winit::{
     dpi::{LogicalPosition, LogicalSize},
     keyboard::{Key as WinitKey, KeyLocation, NamedKey},
-    platform::modifier_supplement::KeyEventExtModifierSupplement,
 };
 
 use winit::{
@@ -447,7 +449,10 @@ impl WinitPlatform {
                     }
                 }
 
+                #[cfg(not(any(target_os = "android", target_os = "ios", target_arch = "wasm32")))]
                 let key = event.key_without_modifiers();
+                #[cfg(any(target_os = "android", target_os = "ios", target_arch = "wasm32"))]
+                let key = event.logical_key.clone();
                 let pressed = event.state == ElementState::Pressed;
 
                 // We map both left and right ctrl to `ModCtrl`, etc.
